@@ -30,6 +30,18 @@ export function PreviewStep({ datasetInfo, file, onComplete, onBack }: PreviewSt
   const [isNormalizing, setIsNormalizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const formatPassengerClass = (row: PreviewRow) => {
+    if (row.passengerClass) {
+      return row.passengerClass
+    }
+
+    if (typeof row.pclass === "number") {
+      return `Clase ${row.pclass}`
+    }
+
+    return "-"
+  }
+
   const handlePreview = async () => {
     if (!file) return
     setIsLoading(true)
@@ -127,7 +139,7 @@ export function PreviewStep({ datasetInfo, file, onComplete, onBack }: PreviewSt
                       <TableCell>{row.age}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="font-normal">
-                          {row.passengerClass}
+                          {formatPassengerClass(row)}
                         </Badge>
                       </TableCell>
                       <TableCell>{row.sex}</TableCell>

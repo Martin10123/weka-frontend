@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { StepIndicator } from "@/components/step-indicator"
 import { DatasetStep } from "./steps/dataset-step"
 import { PreviewStep } from "./steps/preview-step"
@@ -8,6 +8,7 @@ import { TrainStep } from "./steps/train-step"
 import { PredictStep } from "./steps/predict-step"
 import { ExplainStep } from "./steps/explain-step"
 import { WhatIfStep } from "./steps/what-if-step"
+import { useTitanicStore } from "./titanic-store"
 
 const TITANIC_STEPS = [
   { id: 1, name: "Upload" },
@@ -50,28 +51,46 @@ export interface PassengerProfile {
 }
 
 export function TitanicModule() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [datasetInfo, setDatasetInfo] = useState<DatasetInfo | null>(null)
-  const [trainingResult, setTrainingResult] = useState<TrainingResult | null>(null)
-  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
-  const [currentProfile, setCurrentProfile] = useState<PassengerProfile | null>(null)
-  const [narrative, setNarrative] = useState<string>("")
+  const currentStep = useTitanicStore((state) => state.currentStep)
+  const completedSteps = useTitanicStore((state) => state.completedSteps)
+  const uploadedFile = useTitanicStore((state) => state.uploadedFile)
+  const uploadedFileData = useTitanicStore((state) => state.uploadedFileData)
+  const datasetInfo = useTitanicStore((state) => state.datasetInfo)
+  const trainingResult = useTitanicStore((state) => state.trainingResult)
+  const predictionResult = useTitanicStore((state) => state.predictionResult)
+  const currentProfile = useTitanicStore((state) => state.currentProfile)
+  const narrative = useTitanicStore((state) => state.narrative)
+  const setDatasetInfo = useTitanicStore((state) => state.setDatasetInfo)
+  const setTrainingResult = useTitanicStore((state) => state.setTrainingResult)
+  const setPredictionResult = useTitanicStore((state) => state.setPredictionResult)
+  const setCurrentProfile = useTitanicStore((state) => state.setCurrentProfile)
+  const setNarrative = useTitanicStore((state) => state.setNarrative)
+  const setUploadedFile = useTitanicStore((state) => state.setUploadedFile)
+  const completeStep = useTitanicStore((state) => state.completeStep)
+  const goToStep = useTitanicStore((state) => state.goToStep)
+  const restoreUploadedFile = useTitanicStore((state) => state.restoreUploadedFile)
+  const [hasHydrated, setHasHydrated] = useState(useTitanicStore.persist.hasHydrated())
 
-  const completeStep = (stepId: number) => {
-    if (!completedSteps.includes(stepId)) {
-      setCompletedSteps([...completedSteps, stepId])
-    }
-    if (stepId < TITANIC_STEPS.length) {
-      setCurrentStep(stepId + 1)
-    }
-  }
+  useEffect(() => {
+    const unsubscribe = useTitanicStore.persist.onFinishHydration(() => {
+      setHasHydrated(true)
+    })
 
-  const goToStep = (stepId: number) => {
-    if (completedSteps.includes(stepId - 1) || stepId === 1) {
-      setCurrentStep(stepId)
+    if (useTitanicStore.persist.hasHydrated()) {
+      setHasHydrated(true)
     }
+
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    if (hasHydrated) {
+      restoreUploadedFile()
+    }
+  }, [hasHydrated, uploadedFileData, restoreUploadedFile])
+
+  if (!hasHydrated) {
+    return null
   }
 
   return (
@@ -87,9 +106,9 @@ export function TitanicModule() {
       <div className="rounded-lg border bg-card">
         {currentStep === 1 && (
           <DatasetStep
-            onComplete={(info, file) => {
+            onComplete={async (info, file) => {
+              await setUploadedFile(file)
               setDatasetInfo(info)
-              setUploadedFile(file)
               completeStep(1)
             }}
           />

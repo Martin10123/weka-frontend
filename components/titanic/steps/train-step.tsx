@@ -26,6 +26,7 @@ export function TrainStep({ datasetInfo, file, onComplete, onBack }: TrainStepPr
     setIsTraining(true)
     setProgress(0)
     setError(null)
+    setTrainingResult(null)
 
     // Fake progress bar while the request is in flight
     const interval = setInterval(() => {
@@ -161,18 +162,29 @@ export function TrainStep({ datasetInfo, file, onComplete, onBack }: TrainStepPr
                 </div>
                 <p className="text-sm text-foreground">{trainingResult.insight}</p>
               </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <Button variant="outline" onClick={onBack}>
+                  Atrás
+                </Button>
+                <Button variant="outline" onClick={handleTrain} disabled={!file || isTraining}>
+                  {isTraining ? "Reintentando..." : "Reintentar entrenamiento"}
+                </Button>
+                <Button onClick={handleContinue} disabled={!trainingResult}>
+                  Continuar a predicción
+                </Button>
+              </div>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={onBack}>
-              Atrás
-            </Button>
-            <Button onClick={handleContinue} disabled={!trainingResult}>
-              Continuar a predicción
-            </Button>
-          </div>
+          {!trainingResult && (
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={onBack}>
+                Atrás
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </div>

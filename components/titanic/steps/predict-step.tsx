@@ -192,18 +192,29 @@ export function PredictStep({ onComplete, onBack }: PredictStepProps) {
               </div>
 
               <p className="mt-3 text-sm text-muted-foreground">{result.insight}</p>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <Button variant="outline" onClick={onBack}>
+                  Atrás
+                </Button>
+                <Button variant="outline" onClick={handlePredict} disabled={isPredicting}>
+                  {isPredicting ? "Reintentando..." : "Reintentar predicción"}
+                </Button>
+                <Button onClick={handleContinue} disabled={!result}>
+                  Obtener explicación
+                </Button>
+              </div>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={onBack}>
-              Atrás
-            </Button>
-            <Button onClick={handleContinue} disabled={!result}>
-              Obtener explicación
-            </Button>
-          </div>
+          {!result && (
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={onBack}>
+                Atrás
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </div>

@@ -154,9 +154,6 @@ export function WhatIfStep({ profile, onBack }: WhatIfStepProps) {
                   <SelectTrigger>
                     <SelectValue placeholder="Select a field first" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">-</SelectItem>
-                  </SelectContent>
                 </Select>
               )}
             </div>

@@ -15,7 +15,8 @@ export interface UploadResponse {
 
 export interface PreviewRow {
   age: number
-  passengerClass: string
+  passengerClass?: string
+  pclass?: number
   sex: string
   travelingAlone: boolean
   embarked: string

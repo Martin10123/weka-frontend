@@ -8,7 +8,7 @@ import { validateDataset, uploadDataset } from "@/lib/api"
 import type { DatasetInfo } from "../titanic-module"
 
 interface DatasetStepProps {
-  onComplete: (info: DatasetInfo, file: File) => void
+  onComplete: (info: DatasetInfo, file: File) => Promise<void> | void
 }
 
 export function DatasetStep({ onComplete }: DatasetStepProps) {
@@ -55,7 +55,7 @@ export function DatasetStep({ onComplete }: DatasetStepProps) {
 
     try {
       const result = await uploadDataset(file)
-      onComplete(
+      await onComplete(
         {
           fileName: result.sourceFileName,
           totalRows: result.totalRows,
@@ -91,6 +91,7 @@ export function DatasetStep({ onComplete }: DatasetStepProps) {
               type="file"
               accept=".csv,.arff"
               onChange={handleFileChange}
+              aria-label="Archivo del dataset Titanic"
               className="absolute inset-0 cursor-pointer opacity-0"
             />
             <div className="flex flex-col items-center gap-2">
